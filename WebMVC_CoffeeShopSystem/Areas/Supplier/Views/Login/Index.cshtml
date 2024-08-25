@@ -1,0 +1,165 @@
+﻿
+@{
+    Layout = null;
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="~/Content/assetsLoginSeller/fonts/icomoon/style.css">
+    <link rel="icon" href="~/Content/assetsSeller/img/icon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="~/Content/assetsLoginSeller/css/owl.carousel.min.css">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="~/Content/assetsLoginSeller/css/bootstrap.min.css">
+
+    <!-- Style -->
+    <link rel="stylesheet" href="~/Content/assetsLoginSeller/css/style.css">
+
+    <title>Log In | Supplier</title>
+</head>
+<body>
+
+
+    <div class="d-lg-flex half">
+        <div class="bg order-1 order-md-2" style="background-image: url('/Content/assetsLoginSeller/images/bg_1.jpg');"></div>
+        <div class="contents order-2 order-md-1">
+
+            <div class="container">
+                <div class="row align-items-center justify-content-center">
+                    <div class="col-md-7">
+                        <h3>Login to <strong>Supplier Cafena</strong></h3>
+                        <p class="mb-4">Welcome back supplier. Please log in to your account to use the service.</p>
+
+                        <div class="form-group first">
+                            <label for="email">Email</label>
+                            <p style="color:red" id="msgEmail"></p>
+                            <input type="text" class="form-control" maxlength="50" autocomplete="off" placeholder="your-email@gmail.com" id="email">
+                        </div>
+                        <div class="form-group last mb-3">
+                            <label for="password">Password</label>
+                            <p style="color:red" id="msgPass"></p>
+                            <input type="password" class="form-control" autocomplete="off" placeholder="Your Password" id="password">
+                        </div>
+
+                        <div class="d-flex mb-5 align-items-center">
+                            <p style="color:red" id="msgCheck"></p>
+                            <span class="ml-auto"><a href="#" class="forgot-pass">Forgot Password</a></span>
+                        </div>
+
+                        <button class="btn btn-block btn-primary" id="btnLogin">Log In</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="~/Content/assetsLoginSeller/js/jquery-3.3.1.min.js"></script>
+    <script src="~/Content/assetsLoginSeller/js/popper.min.js"></script>
+    <script src="~/Content/assetsLoginSeller/js/bootstrap.min.js"></script>
+    <script src="~/Content/assetsLoginSeller/js/main.js"></script>
+    <script>
+        $("#msgEmail").hide();
+        $("#msgPass").hide();
+        $("#msgCheck").hide();
+        checkMail();
+        checkPassWithMail();
+        var originURL = window.location.origin;
+        
+        $("#btnLogin").click(function () {
+            if ($("#email").val().trim() == "" || $("#password").val() == "") {
+                $("#msgCheck").text("Please fill in the information above.");
+                $("#msgCheck").css("display", "inline").fadeOut(2000);
+            } else {
+                if ($("#msgEmail").text() == "" && $("#msgPass").text() == "") {
+                    $.ajax({
+                        type: "get",
+                        url: "/Login/GetSupplierLogin",
+                        data: {
+                            email: $("#email").val().trim(),
+                            password:$("#password").val()
+                        },
+                        success: function (res) {
+                            if (res == "False") {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Oops...",
+                                    text: "It seems something went wrong. Please reload the page and log in again.",
+                                    showConfirmButton: false,
+                                    timer: 1300
+                                });
+                            } else {
+                                window.location.href = origin + "/Supplier/Dashboard";
+                            }
+                        },
+                        error: function (response) {
+                            console.log(response.responseText);
+                        }
+                    });
+                }
+            }
+        });
+
+
+        function checkMail() {
+            window.setInterval(function () {
+                if ($("#email").val().trim() != "") {
+                    $.ajax({
+                        type: "get",
+                        url: "/Login/CheckEmailSupplier",
+                        data: {
+                            email: $("#email").val().trim()
+                        },
+                        success: function (res) {
+                            if (res == "False") {
+                                $("#msgEmail").text("Email doesn't exist. Check again or sign up with this email.");
+                                $("#msgEmail").show();
+
+                            } else {
+                                $("#msgEmail").hide();
+                                $("#msgEmail").text("");
+                            }
+                        },
+                        error: function (response) {
+                            console.log(response.responseText);
+                        }
+                    });
+                } else {
+                    $("#msgEmail").hide();
+                }
+            }, 900);
+        }
+        function checkPassWithMail() {
+            window.setInterval(function () {
+                if ($("#email").val().trim() != "" && $("#password").val() != "") {
+                    $.ajax({
+                        type: "get",
+                        url: "/Login/CheckPassSupplier",
+                        data: {
+                            email: $("#email").val().trim(),
+                            password: $("#password").val()
+                        },
+                        success: function (res) {
+                            if (res == "False") {
+                                $("#msgPass").text("Incorrect password. Check your password again.");
+                                $("#msgPass").show();
+                            } else {
+                                $("#msgPass").hide();
+                                $("#msgPass").text("");
+                            }
+                        },
+                        error: function (response) {
+                            console.log(response.responseText);
+                        }
+                    });
+                } else {
+                    $("#msgPass").hide();
+                }
+            }, 900);
+        }
+    </script>
+</body>
+</html>
